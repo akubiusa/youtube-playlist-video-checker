@@ -1,7 +1,7 @@
 # Copilot code review instructions
 
 Small Python CLI: polls YouTube playlists (Data API v3) and posts a Discord
-embed per newly added video. No tests, linter, or CI exist. Prioritize
+embed per newly added video. CI runs `compileall`, `ruff check`, `ruff format --check`, and `pytest`. Prioritize
 correctness and secret-safety over style nits.
 
 ## Review priorities
@@ -25,7 +25,7 @@ correctness and secret-safety over style nits.
   check for failures/rate limits. Raising this is welcome, but see non-issues
   below before treating it as a blocker.
 - **Fatal-on-missing config** in `src/config.py` (`logger.critical` +
-  `exit(1)`) is intentional; do not suggest silently defaulting required keys.
+  `sys.exit(1)`) is intentional; do not suggest silently defaulting required keys.
 
 ## Known non-issues (do not flag)
 
@@ -37,8 +37,9 @@ correctness and secret-safety over style nits.
   stale; the code targets 3.9+. Flag the README, not the code.
 - `requirements.txt` being UTF-16 encoded is a pre-existing repo condition, not
   introduced by a normal PR; only mention it if a PR touches that file.
-- Absence of a test suite / CI — known; do not request adding tests unless the
+- Small or absent test coverage — known; do not request adding tests unless the
   PR itself adds testable logic.
+- `setuptools<81` in `requirements.txt` is intentional (`googleapiclient` imports `pkg_resources`).
 
 ## Conventions
 
