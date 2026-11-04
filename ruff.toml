@@ -1,6 +1,6 @@
-# CLAUDE.md: the code targets Python 3.9+ (PEP 585 generics, no `X | None` syntax)
+# The code targets Python 3.9+ (see CLAUDE.md)
 target-version = "py39"
 
 [lint]
-# CLAUDE.md: keep str.format() / % formatting, do not churn into f-strings
+# Keep str.format() / % formatting; do not churn into f-strings (see CLAUDE.md)
 ignore = ["UP031", "UP032"]

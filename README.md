@@ -6,7 +6,7 @@ Notify Discord of newly added videos to multiple YouTube playlists.
 
 - Vaild Discord Bot token and Writeable message channel
 - Python 3.6+
-- [requirements.txt](requirements.txt): `requests`, `youtube-dl`
+- [requirements.txt](requirements.txt): `google-api-python-client`, `python-dotenv`, `youtube-dl`, `requests`, and `setuptools<81` (`google-api-python-client` imports `pkg_resources`, which newer setuptools removed)
 
 ## Installation
 
