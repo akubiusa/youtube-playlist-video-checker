@@ -9,10 +9,12 @@ is kept in a local JSON file so each video is announced only once.
 
 ## Development commands
 
-There is no build step, test suite, linter, or CI configured in this repo.
+There is no build step.
+CI (`.github/workflows/python-ci.yml`, reusable workflow from `book000/templates`) runs `python -m compileall`, `ruff check`, `ruff format --check`, and `pytest`.
 
 - Install dependencies: `pip3 install -U -r requirements.txt`
 - Run: `python3 -m src` (executes `src/__main__.py:main`)
+- Lint / format check: `ruff check` and `ruff format --check` (config in `ruff.toml`)
 
 Run from the repository root: at runtime the process reads `.env`,
 `playlists.json`, and `already.json` from the current working directory and
@@ -21,7 +23,7 @@ writes logs under `logs/`.
 ## Configuration (runtime, git-ignored)
 
 - `.env` (loaded by `python-dotenv` in `src/config.py`). Required keys, each
-  fatal if missing (`logger.critical` + `exit(1)`):
+  fatal if missing (`logger.critical` + `sys.exit(1)`):
   - `GOOGLE_TOKEN`: YouTube Data API v3 key.
   - `DISCORD_TOKEN`: Discord bot token.
   - `DISCORD_CHANNEL_ID`: target Discord channel ID.
@@ -58,12 +60,12 @@ never commit real tokens or state.
 ## Coding conventions
 
 - Match the existing style: `snake_case` functions, standard-library-first,
-  `str.format()` / `%` formatting (do not churn these into f-strings).
+  `str.format()` / `%` formatting (do not churn these into f-strings; `ruff.toml` ignores UP031/UP032 for this reason).
 - YouTube API calls use `googleapiclient` with `list_next` pagination; preserve
   the pagination loops when editing fetch logic.
 - Discord messages are sent by direct `requests` calls in `send_discord_message`
   rather than a Discord library; keep new Discord logic going through it.
-- The code uses PEP 585 builtin generics (`list[str]`), so Python 3.9+ is
+- The code uses PEP 585 builtin generics (`list[str]`) and `str | None` (with `from __future__ import annotations`), so Python 3.9+ is
   required despite the README saying 3.6+.
 
 ## Documentation update rules
@@ -71,3 +73,4 @@ never commit real tokens or state.
 - If you change dependencies, runtime files, or the run command, update both
   `README.md` and this file. Note that `README.md` currently understates the
   dependency set (see it listing only `requests`/`youtube-dl`).
+- `requirements.txt` pins `setuptools<81` because `googleapiclient` imports `pkg_resources`, which newer setuptools removed.

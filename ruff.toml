@@ -1,0 +1,6 @@
+# The code targets Python 3.9+ (see CLAUDE.md)
+target-version = "py39"
+
+[lint]
+# Keep str.format() / % formatting; do not churn into f-strings (see CLAUDE.md)
+ignore = ["UP031", "UP032"]

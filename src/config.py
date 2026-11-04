@@ -1,5 +1,8 @@
-from dotenv import load_dotenv
 import os
+import sys
+
+from dotenv import load_dotenv
+
 from src import init_logger
 
 logger = init_logger("Config")
@@ -11,7 +14,7 @@ def getKey(key: str, default_value=None):
     value = os.getenv(key)
     if default_value is None and value is None:
         logger.critical("{} is not defined.".format(key))
-        exit(1)
+        sys.exit(1)
     if value is None and default_value is not None:
         return default_value
     return value

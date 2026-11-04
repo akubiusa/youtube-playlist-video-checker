@@ -6,7 +6,7 @@ from unittest import mock
 for _key in ("GOOGLE_TOKEN", "DISCORD_TOKEN", "DISCORD_CHANNEL_ID"):
     os.environ.setdefault(_key, "dummy")
 
-from src.__main__ import get_videos_details  # noqa: E402
+from src.__main__ import get_videos_details
 
 
 def create_youtube_mock(live_ids=()):
@@ -23,7 +23,9 @@ def create_youtube_mock(live_ids=()):
                 {
                     "id": video_id,
                     "snippet": {
-                        "liveBroadcastContent": "live" if video_id in live_ids else "none"
+                        "liveBroadcastContent": "live"
+                        if video_id in live_ids
+                        else "none"
                     },
                 }
                 for video_id in ids
