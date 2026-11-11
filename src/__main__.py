@@ -5,7 +5,7 @@ from googleapiclient.discovery import build
 
 from src import config, send_discord_message
 
-# YouTube Data API の videos.list で 1 回に指定できる ID の最大数
+# YouTube Data API limit on IDs per videos.list call
 VIDEOS_LIST_MAX_IDS = 50
 
 
@@ -29,7 +29,6 @@ def get_playlist_items(youtube, playlist_id):
 
 def get_videos_details(youtube, new_videos: list[str]):
     video_details_items = {}
-    # videos.list の id パラメータは最大 50 件のため、端数も含めて 50 件ずつ分割して取得する
     for i in range(0, len(new_videos), VIDEOS_LIST_MAX_IDS):
         new_videos_temp = new_videos[i : i + VIDEOS_LIST_MAX_IDS]
         new_videos_details_request = youtube.videos().list(
@@ -45,7 +44,7 @@ def get_videos_details(youtube, new_videos: list[str]):
             new_videos_details_request = youtube.videos().list_next(
                 new_videos_details_request, new_videos_details
             )
-    # ライブ配信中・配信予定の動画を除いた ID を、渡された順序のまま返す
+    # Keep the caller's order so notifications stay in playlist order
     ret = [video_id for video_id in new_videos if video_id in video_details_items]
     return ret, video_details_items
 

@@ -1,6 +1,6 @@
-# The code targets Python 3.9+ (see CLAUDE.md)
+# The code targets Python 3.9+ (see AGENTS.md)
 target-version = "py39"
 
 [lint]
-# Keep str.format() / % formatting; do not churn into f-strings (see CLAUDE.md)
+# Keep str.format() / % formatting; do not churn into f-strings (see AGENTS.md)
 ignore = ["UP031", "UP032"]

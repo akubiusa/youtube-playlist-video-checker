@@ -1,48 +1,26 @@
 # Copilot code review instructions
 
-Small Python CLI: polls YouTube playlists (Data API v3) and posts a Discord
-embed per newly added video. CI runs `compileall`, `ruff check`, `ruff format --check`, and `pytest`. Prioritize
-correctness and secret-safety over style nits.
+Follow `AGENTS.md` for project guidance. Prioritize correctness and secret safety over style nits.
 
-## Review priorities
+## Language
 
-- **Secrets and state must not be committed.** Flag any diff that adds real
-  values to `.env`, `playlists.json`, or `already.json`, or that removes those
-  entries from `.gitignore`. Only `sample.env` / `playlists.sample.json` may
-  contain placeholders.
-- **Preserve "announce once" idempotency.** State lives only in `already.json`.
-  Flag changes that could re-announce old videos, drop the dedup check
-  (`videoId in already[playlist]`), or write state before a video is actually
-  sent.
-- **Preserve the silent first run.** When a playlist is new (`init = True`),
-  its existing videos are recorded but not sent to Discord. Flag edits that
-  would notify the whole backlog on first run.
-- **Preserve the live/upcoming filter.** `get_videos_details` keeps only
-  `liveBroadcastContent == "none"`. Flag removal of this filter.
-- **API pagination.** YouTube calls use `list_next` loops; flag edits that read
-  only the first page.
-- **HTTP error handling.** `send_discord_message` and the YouTube calls do not
-  check for failures/rate limits. Raising this is welcome, but see non-issues
-  below before treating it as a blocker.
-- **Fatal-on-missing config** in `src/config.py` (`logger.critical` +
-  `sys.exit(1)`) is intentional; do not suggest silently defaulting required keys.
+Deliverables (commit messages, PR/Issue text, review comments, code comments, docs) are written in English. Runtime messages are English. Flag non-English prose in new or changed deliverables, except quotations, technical identifiers, generated files and external source text.
+
+## Review checklist
+
+- **Secrets and state must not be committed.** Flag real values in `.env`, `playlists.json` or `already.json`, or removal of those entries from `.gitignore`. Only `sample.env` and `playlists.sample.json` may contain placeholders.
+- **Preserve "announce once".** State lives only in `already.json`. Flag changes that could re-announce old videos, drop the dedup check (`videoId in already[playlist]`), or record an ID before the video is handled.
+- **Preserve the silent first run.** A new playlist (`init = True`) records its videos without sending them to Discord.
+- **Preserve the live/upcoming filter** in `get_videos_details` (`liveBroadcastContent == "none"`).
+- **Pagination.** YouTube calls use `list_next` loops; flag edits that read only the first page.
+- **Fatal-on-missing config** in `src/config.py` is intentional; do not suggest silent defaults for required keys.
+- **HTTP error handling.** `send_discord_message` and the YouTube calls do not check for failures or rate limits. Raising this is welcome but is not a blocker for unrelated changes.
+- Keep `README.md` and `AGENTS.md` in sync with dependency, runtime-file or run-command changes.
 
 ## Known non-issues (do not flag)
 
-- `str.format()` and `%` formatting instead of f-strings — this is the
-  established style; do not suggest converting.
-- Direct `requests` POST to the Discord REST API instead of a Discord library —
-  intentional and minimal.
-- `list[str]` type hints while the README says Python 3.6+ — the README is
-  stale; the code targets 3.9+. Flag the README, not the code.
-- `requirements.txt` being UTF-16 encoded is a pre-existing repo condition, not
-  introduced by a normal PR; only mention it if a PR touches that file.
-- Small or absent test coverage — known; do not request adding tests unless the
-  PR itself adds testable logic.
-- `setuptools<81` in `requirements.txt` is intentional (`googleapiclient` imports `pkg_resources`).
-
-## Conventions
-
-- Python, standard-library-first, `snake_case` functions.
-- Runtime files (`.env`, `playlists.json`, `already.json`, `logs/`) are
-  git-ignored and read from the current working directory at run time.
+- `str.format()` / `%` formatting instead of f-strings.
+- Direct `requests` POST to the Discord REST API instead of a library.
+- `requirements.txt` being UTF-16 encoded (pre-existing; mention only if a PR touches it).
+- `setuptools<81` in `requirements.txt` (`googleapiclient` imports `pkg_resources`).
+- Small test coverage; do not request tests unless the PR adds testable logic.

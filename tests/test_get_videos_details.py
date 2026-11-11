@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest import mock
 
-# src.config は import 時に環境変数を要求するため、ダミー値を設定してから import する
+# src.config requires these environment variables at import time, so set dummy values before importing
 for _key in ("GOOGLE_TOKEN", "DISCORD_TOKEN", "DISCORD_CHANNEL_ID"):
     os.environ.setdefault(_key, "dummy")
 
@@ -10,7 +10,7 @@ from src.__main__ import get_videos_details
 
 
 def create_youtube_mock(live_ids=()):
-    """videos().list(id=...) の呼び出しを記録し、ID ごとの動画情報を返すモック"""
+    """Mock that records videos().list(id=...) calls and returns per-ID video info."""
     youtube = mock.MagicMock()
     requested_id_counts = []
 
