@@ -1,35 +1,41 @@
 # youtube-playlist-video-checker
 
-Notify Discord of newly added videos to multiple YouTube playlists.
+Notify Discord of newly added videos in multiple YouTube playlists.
+
+The script checks each playlist through the YouTube Data API v3 and posts a Discord embed for every video it has not announced yet. It is meant to be run periodically (for example from cron).
 
 ## Requirements
 
-- Vaild Discord Bot token and Writeable message channel
-- Python 3.6+
-- [requirements.txt](requirements.txt): `google-api-python-client`, `python-dotenv`, `youtube-dl`, `requests`, and `setuptools<81` (`google-api-python-client` imports `pkg_resources`, which newer setuptools removed)
+- A valid Discord bot token and a channel the bot can post messages to
+- A Google Cloud Platform API key with the YouTube Data API v3 enabled
+- Python 3.9+
+- The packages in [requirements.txt](requirements.txt), notably `google-api-python-client`, `python-dotenv` and `requests`. `setuptools<81` is pinned because `google-api-python-client` imports `pkg_resources`, which newer setuptools removed.
 
 ## Installation
 
-1. Clone from GitHub repository: `git clone https://github.com/book000/youtube-playlist-video-checker.git`
-2. Install the dependency package from `requirements.txt`: `pip3 install -U -r requirements.txt`
+1. Clone the repository: `git clone https://github.com/book000/youtube-playlist-video-checker.git`
+2. Install the dependencies: `pip3 install -U -r requirements.txt`
 
 ## Configuration
 
-- Rewrite `sample.env` and rename to `.env`.
-  - `DISCORD_TOKEN`: Discord Bot token
-  - `DISCORD_CHANNEL_ID`: Discord Send to channel ID
+- Copy `sample.env` to `.env` and fill in the values. All three are required; the program exits if one is missing.
+  - `DISCORD_TOKEN`: Discord bot token
+  - `DISCORD_CHANNEL_ID`: ID of the channel to post to
   - `GOOGLE_TOKEN`: Google Cloud Platform API key
-- Rewrite `playlists.sample.json` and rename to `playlists.json`.
-  - Enter the ID of the playlist to check.
+- Copy `playlists.sample.json` to `playlists.json` and list the IDs of the playlists to check (a JSON array of strings).
 
 ## Usage
 
 ```shell
-cd /path/to/
+cd /path/to/youtube-playlist-video-checker
 python3 -m src
 ```
 
-The `.env` file in the current directory will be read, so change to the root directory of the project in advance before executing.
+Run it from the project root: `playlists.json`, `already.json` and the `logs/` directory are read and written relative to the current directory.
+
+- `already.json` is created automatically and records the video IDs already announced for each playlist, so each video is announced only once.
+- The first run for a playlist only records its existing videos and does not post them to Discord.
+- Live streams and premieres are skipped until they become regular videos.
 
 ## Warning / Disclaimer
 
