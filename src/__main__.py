@@ -1,8 +1,11 @@
 import json
 import os
+import re
+import sys
 
 import requests
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 from src import config, logger, send_discord_message
 
@@ -50,7 +53,25 @@ def get_videos_details(youtube, new_videos: list[str]):
     return ret, video_details_items
 
 
-def main():
+def describe_http_error(error: HttpError) -> str:
+    """Summarize an HttpError without the request URI, which embeds the API key.
+
+    Only the HTTP status and machine-readable reason codes are included.
+    """
+    description = "HTTP {status}".format(status=error.status_code)
+    details = error.error_details
+    reasons = []
+    if isinstance(details, list):
+        for item in details:
+            reason = item.get("reason") if isinstance(item, dict) else None
+            if isinstance(reason, str) and re.fullmatch(r"[A-Za-z_]+", reason):
+                reasons.append(reason)
+    if reasons:
+        description += ", reason: " + ",".join(reasons)
+    return description
+
+
+def check_playlists():
     already = {}
     if os.path.exists("already.json"):
         with open("already.json", "r") as f:
@@ -156,6 +177,19 @@ def main():
 
     with open("already.json", "w") as f:
         f.write(json.dumps(already))
+
+
+def main():
+    failure = None
+    try:
+        check_playlists()
+    except HttpError as e:
+        failure = describe_http_error(e)
+    # Exit outside the except block so the HttpError, whose message holds the
+    # API key, is not chained onto SystemExit.
+    if failure is not None:
+        logger.error("YouTube API request failed: {failure}".format(failure=failure))
+        sys.exit(1)
 
 
 if __name__ == "__main__":
