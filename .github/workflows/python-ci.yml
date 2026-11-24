@@ -1,4 +1,4 @@
-# Runs the Python syntax check, ruff and pytest. Uses .python-version for the Python version if present
+# Runs the Python syntax check, ruff and pytest on the supported minimum and current interpreter.
 
 name: Python CI
 
@@ -15,5 +15,11 @@ on:
 
 jobs:
   python-ci:
-    name: Python CI
+    name: Python ${{ matrix.python-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.15"]
     uses: book000/templates/.github/workflows/reusable-python-ci.yml@master
+    with:
+      python-version: ${{ matrix.python-version }}
